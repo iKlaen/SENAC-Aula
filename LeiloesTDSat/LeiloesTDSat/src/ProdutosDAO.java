@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.sql.SQLException;
 
+
+
 public class ProdutosDAO {
 
     Connection conn;
@@ -16,7 +18,7 @@ public class ProdutosDAO {
     //Ajustes no metodo para inserir os produtos no banco de dados utilizando o SQL
     public void cadastrarProduto(ProdutosDTO produto) {
     String sql = "INSERT INTO produtos (nome, valor, status) VALUES (?, ?, ?)";
-    
+
     try {
         conn = new conectaDAO().connectDB(); // Conecta ao banco de dados
         prep = conn.prepareStatement(sql);
@@ -36,9 +38,36 @@ public class ProdutosDAO {
             e.printStackTrace();
         }
     }
-    public ArrayList<ProdutosDTO> listarProdutos() {
+}
+    public ArrayList<ProdutosDTO> listarProdutos(){
+    String sql = "SELECT * FROM produtos";
+    listagem.clear();
+    
+    try {
+        conn = new conectaDAO().connectDB(); // Conecta ao banco de dados
+        prep = conn.prepareStatement(sql);
+        resultset = prep.executeQuery();
 
-        return listagem;
+        while (resultset.next()) {
+            ProdutosDTO produto = new ProdutosDTO();
+            produto.setId(resultset.getInt("id"));
+            produto.setNome(resultset.getString("nome"));
+            produto.setValor(resultset.getInt("valor"));
+            produto.setStatus(resultset.getString("status"));
+            listagem.add(produto);
+        }
+    } catch (SQLException erro) {
+        JOptionPane.showMessageDialog(null, "Erro ao listar produtos: " + erro.getMessage());
+    } finally {
+        try {
+            if (resultset != null) resultset.close();
+            if (prep != null) prep.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-
+    
+    return listagem;
+}
 }
